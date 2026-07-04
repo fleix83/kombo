@@ -1,0 +1,47 @@
+import { useState } from 'react'
+import { formatDistanceKm } from '../../core/logic/distance'
+import type { DeckCard } from '../../core/types/db'
+import { de } from '../i18n/de'
+import { Doodle } from './Doodle'
+import { TypeBadge } from './TypeBadge'
+
+// Deck card layout (PRD §5.4): one mobile screen, no page scrolling.
+// Description truncates and expands in place (scrolls inside the card).
+export function CardView({ card }: { card: DeckCard }) {
+  const [expanded, setExpanded] = useState(false)
+
+  return (
+    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+      <div className="flex h-44 shrink-0 items-center justify-center border-b border-zinc-100 bg-zinc-50">
+        <Doodle url={card.drawing_url ?? card.owner_drawing_url} className="h-32 w-32" />
+      </div>
+
+      <div className={`flex-1 p-4 ${expanded ? 'overflow-y-auto' : 'overflow-hidden'}`}>
+        <TypeBadge type={card.card_type} />
+        <h2 className="mt-2 text-lg font-semibold leading-snug">{card.title}</h2>
+        <p className={`mt-2 text-sm text-zinc-600 ${expanded ? '' : 'line-clamp-4'}`}>
+          {card.description}
+        </p>
+        {!expanded && card.description.length > 180 && (
+          <button
+            type="button"
+            className="mt-1 text-sm font-medium text-zinc-900 underline"
+            onClick={() => setExpanded(true)}
+          >
+            {de.common.more}
+          </button>
+        )}
+      </div>
+
+      <div className="shrink-0 border-t border-zinc-100 p-4 text-sm text-zinc-600">
+        <span className="font-medium text-zinc-900">
+          {card.owner_name}, {card.owner_age}
+        </span>
+        {' · '}
+        {card.city}
+        {' · '}
+        {formatDistanceKm(card.distance_km)}
+      </div>
+    </div>
+  )
+}
