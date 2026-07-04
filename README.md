@@ -29,7 +29,7 @@ Der Supabase-Client wird via `initSupabase(url, key)` aus `main.tsx` initialisie
 | Datum | Entscheidung |
 |---|---|
 | 2026-07-04 | **DB-Region: Zürich (eu-central-2)** statt Frankfurt — Entscheid Product Owner. Schweiz hat EU-Angemessenheitsbeschluss, DSGVO-konform. |
-| 2026-07-04 | Deck-Radius: **beidseitig** (kleinerer der beiden `radius_km`-Werte), PRD §4.2. Umstellung auf Swiper-Radius wäre eine Ein-Zeilen-Änderung in `get_deck`. |
+| 2026-07-04 | Deck-Radius: zunächst beidseitig (kleinerer der beiden `radius_km`-Werte), noch am selben Tag gemäss PRD §10.2 auf **Swiper-Radius** umgestellt (Migration `0004`) — der beidseitige Radius führte im Beta-Test zu unerwartet leeren Decks. |
 | 2026-07-04 | Geocoding: **Nominatim** (OpenStreetMap), DACH-gefiltert, debounced (≤ 1 req/s), Koordinaten auf 2 Dezimalstellen gerundet (~1 km) gespeichert. Fallback laut PRD wäre eine gebündelte Städte-Tabelle. |
 | 2026-07-04 | Match-Erzeugung: DB-Trigger auf `swipes` mit `pg_advisory_xact_lock` auf das Kartenpaar → race-sicher. |
 | 2026-07-04 | Versionen bewusst konservativ gepinnt: React 18, Vite 5, Tailwind 3, Router 6, Zustand 4 (Stabilität vor Neuheit). |

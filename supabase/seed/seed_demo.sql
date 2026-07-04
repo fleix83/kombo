@@ -17,7 +17,7 @@ select
   extensions.crypt(gen_random_uuid()::text, extensions.gen_salt('bf')),
   now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(),
   '', '', '', '', '', '', '', ''
-from generate_series(1, 16) n
+from generate_series(1, 22) n
 on conflict (id) do nothing;
 
 -- ---------------------------------------------------------------- profiles
@@ -38,7 +38,14 @@ values
   ('d0000000-0000-4000-8000-000000000013', 'Nina',      '2001-06-29', 'Improtheater und alles was spontan ist.',           'Wien',        48.21, 16.37, true),
   ('d0000000-0000-4000-8000-000000000014', 'Ferdl',     '1973-09-14', 'Musiklehrer, Chorleiter, Notenarchivar.',           'Graz',        47.07, 15.44, true),
   ('d0000000-0000-4000-8000-000000000015', 'Käthi',     '1959-04-02', 'Pensionierte Journalistin, hilft gern beim Texten.', 'Zürich',     47.37,  8.54, true),
-  ('d0000000-0000-4000-8000-000000000016', 'Dario',     '2004-11-23', 'Schneide Videos schneller als mein Schatten.',      'Bern',        46.95,  7.44, true)
+  ('d0000000-0000-4000-8000-000000000016', 'Dario',     '2004-11-23', 'Schneide Videos schneller als mein Schatten.',      'Bern',        46.95,  7.44, true),
+  -- Basel-Cluster (Region Nordwestschweiz / Dreiland)
+  ('d0000000-0000-4000-8000-000000000017', 'Priya',     '1993-02-27', 'Grafikdesignerin, verliebt in Raster und Papier.',  'Basel',       47.56,  7.59, true),
+  ('d0000000-0000-4000-8000-000000000018', 'Marco',     '1987-07-15', 'Velomech mit Werkstattzugang und Geduld.',          'Liestal',     47.48,  7.73, true),
+  ('d0000000-0000-4000-8000-000000000019', 'Heidi',     '1962-10-05', 'Lange im Stiftungswesen gearbeitet, jetzt Zeit für Herzensprojekte.', 'Basel', 47.56, 7.59, true),
+  ('d0000000-0000-4000-8000-000000000020', 'Luc',       '2002-12-18', 'Beats, Synths, Feldaufnahmen vom Rheinufer.',       'Lörrach',     47.61,  7.66, true),
+  ('d0000000-0000-4000-8000-000000000021', 'Aline',     '1998-05-09', 'Schreibe gern über Orte und Menschen.',             'Aarau',       47.39,  8.05, true),
+  ('d0000000-0000-4000-8000-000000000022', 'Stefan',    '1975-03-31', 'Kleinbasler, organisiert gern draussen.',           'Basel',       47.56,  7.59, true)
 on conflict (id) do nothing;
 
 -- ---------------------------------------------------------------- cards
@@ -78,5 +85,13 @@ values
   ('d0000000-0000-4000-8000-000000000015', 'mentor_offer', 'Patin für Text und Öffentlichkeitsarbeit', 'Ex-Journalistin. Lese eure Texte gegen, helfe bei Medienmitteilungen und erzähle euch, wie Redaktionen ticken.', 'Zürich', 47.37, 8.54, 80, true, true),
   ('d0000000-0000-4000-8000-000000000006', 'mentor_offer', 'Pate für Vereinsgründung & Organisation', 'Statuten, Versammlungen, Finanzen — habe drei Vereine mitgegründet und begleite gern euer Projekt zu soliden Strukturen.', 'Bern', 46.95, 7.44, 100, true, true),
   ('d0000000-0000-4000-8000-000000000014', 'mentor_offer', 'Pate für Musikprojekte', 'Chorleiter und Musiklehrer. Höre zu, gebe Feedback zu Arrangements und helfe, Proben zu strukturieren. Aktiv mitspielen mag ich nicht mehr — beraten sehr.', 'Graz', 47.07, 15.44, 100, true, true),
-  ('d0000000-0000-4000-8000-000000000011', 'mentor_offer', 'Patin für Garten- und Quartierprojekte', 'Stadtgärtnerin. Begleite Gemeinschaftsgärten von der Idee bis zur ersten Ernte: Substrat, Bewässerung, Gruppendynamik.', 'München', 48.14, 11.58, 80, true, true)
+  ('d0000000-0000-4000-8000-000000000011', 'mentor_offer', 'Patin für Garten- und Quartierprojekte', 'Stadtgärtnerin. Begleite Gemeinschaftsgärten von der Idee bis zur ersten Ernte: Substrat, Bewässerung, Gruppendynamik.', 'München', 48.14, 11.58, 80, true, true),
+
+  -- Basel-Cluster
+  ('d0000000-0000-4000-8000-000000000017', 'collab_offer', 'Grafikerin für Plakate & Flyer', 'InDesign, Illustrator, Siebdruck-Grundkenntnisse. Gestalte gern das Erscheinungsbild eures Projekts — vom Logo bis zum Programmheft.', 'Basel', 47.56, 7.59, 50, true, true),
+  ('d0000000-0000-4000-8000-000000000018', 'collab_offer', 'Velomech & Bastler hilft beim Aufbau', 'Ob Lastenvelo-Umbau, Standbau oder Reparatur-Event: Ich bringe Werkzeug, Erfahrung und Kaffee mit.', 'Liestal', 47.48, 7.73, 40, true, true),
+  ('d0000000-0000-4000-8000-000000000019', 'mentor_offer', 'Patin für Fundraising & Stiftungen', 'Kenne die Schweizer Stiftungslandschaft gut. Helfe euch, Gesuche zu schreiben und die richtigen Töpfe zu finden — beratend, im Hintergrund.', 'Basel', 47.56, 7.59, 60, true, true),
+  ('d0000000-0000-4000-8000-000000000020', 'collab_offer', 'Beatmaker sucht Musik- oder Filmprojekt', 'Produziere elektronische Musik (Ableton) und Sounddesign. Würde gern einen Kurzfilm vertonen oder bei einem Musikprojekt einsteigen.', 'Lörrach', 47.61, 7.66, 60, true, true),
+  ('d0000000-0000-4000-8000-000000000021', 'collab_offer', 'Texterin für Zines und Websites', 'Portraits, Reportagen, Mikrotexte. Ich mache aus euren Stichworten Sätze, die man gern liest.', 'Aarau', 47.39, 8.05, 80, true, true),
+  ('d0000000-0000-4000-8000-000000000022', 'project', 'Hofkino im Kleinbasel', 'Open-Air-Kino für einen Innenhof: 4 Abende im Spätsommer, Kurzfilme aus der Region. Suche Technik-Hilfe, Kurator:innen und Leute für die Bar.', 'Basel', 47.56, 7.59, 30, true, true)
 ;
