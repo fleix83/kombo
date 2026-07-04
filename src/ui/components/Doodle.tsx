@@ -12,15 +12,22 @@ export function Doodle({
   url,
   alt = '',
   className = 'h-16 w-16',
+  fit = 'contain',
 }: {
   url: string | null | undefined
   alt?: string
   className?: string
+  fit?: 'contain' | 'cover'
 }) {
   return (
     <div className={`shrink-0 overflow-hidden ${className}`}>
       {url ? (
-        <img src={url} alt={alt} className="h-full w-full object-contain" draggable={false} />
+        <img
+          src={url}
+          alt={alt}
+          className={`h-full w-full ${fit === 'cover' ? 'object-cover' : 'object-contain'}`}
+          draggable={false}
+        />
       ) : (
         placeholder
       )}

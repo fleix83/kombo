@@ -10,6 +10,7 @@ import { CityInput } from '../ui/components/CityInput'
 import { DrawingCanvas, type DrawingCanvasHandle } from '../ui/components/DrawingCanvas'
 import { Doodle } from '../ui/components/Doodle'
 import { Field, Input, TextArea } from '../ui/components/Field'
+import { RadiusSlider } from '../ui/components/RadiusSlider'
 import { de } from '../ui/i18n/de'
 
 export function EditProfilePage() {
@@ -19,6 +20,7 @@ export function EditProfilePage() {
 
   const [displayName, setDisplayName] = useState('')
   const [city, setCity] = useState<GeoResult | null>(null)
+  const [radiusKm, setRadiusKm] = useState(50)
   const [bio, setBio] = useState('')
   const [redraw, setRedraw] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -31,6 +33,7 @@ export function EditProfilePage() {
     if (profile) {
       setDisplayName(profile.display_name)
       setCity({ city: profile.city, lat: profile.lat, lng: profile.lng, label: profile.city })
+      setRadiusKm(profile.radius_km)
       setBio(profile.bio ?? '')
     }
   }, [profile])
@@ -59,6 +62,7 @@ export function EditProfilePage() {
         city: city.city,
         lat: city.lat,
         lng: city.lng,
+        radius_km: radiusKm,
         bio: bio.trim() || null,
         ...(drawingUrl ? { drawing_url: drawingUrl } : {}),
       })
@@ -88,6 +92,7 @@ export function EditProfilePage() {
         <Field label={de.onboarding.city} error={errors.city}>
           <CityInput value={city} onChange={setCity} allowGeolocation />
         </Field>
+        <RadiusSlider value={radiusKm} onChange={setRadiusKm} hint={de.onboarding.radiusHint} />
         <Field label={de.onboarding.bio} error={errors.bio}>
           <TextArea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={500} />
         </Field>

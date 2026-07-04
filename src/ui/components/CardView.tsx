@@ -18,6 +18,49 @@ export interface CardViewData {
   owner_drawing_url?: string | null
 }
 
+// Header doodle: user-drawn doodles (storage PNGs) and wide images fill the
+// header edge-to-edge. Only the square SVG seed motifs (data URIs) keep
+// their centered look — they are icons, not banners.
+export function CardHeaderDoodle({
+  url,
+  fallbackUrl,
+}: {
+  url: string | null | undefined
+  fallbackUrl?: string | null
+}) {
+  const [wide, setWide] = useState(false)
+  if (!url) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <Doodle url={fallbackUrl} className="h-32 w-32" />
+      </div>
+    )
+  }
+  const isSeedIcon = url.startsWith('data:')
+  const detect = (img: HTMLImageElement) =>
+    setWide(img.naturalWidth > img.naturalHeight * 1.4)
+  const fullBleed = wide || !isSeedIcon
+  return fullBleed ? (
+    <img
+      src={url}
+      alt=""
+      draggable={false}
+      className="h-full w-full object-cover"
+      onLoad={(e) => detect(e.currentTarget)}
+    />
+  ) : (
+    <div className="flex h-full items-center justify-center">
+      <img
+        src={url}
+        alt=""
+        draggable={false}
+        className="h-32 w-32 object-contain"
+        onLoad={(e) => detect(e.currentTarget)}
+      />
+    </div>
+  )
+}
+
 // Deck card layout (PRD §5.4): one mobile screen, no page scrolling.
 // Description truncates and expands in place (scrolls inside the card).
 export function CardView({ card }: { card: CardViewData }) {
@@ -25,8 +68,8 @@ export function CardView({ card }: { card: CardViewData }) {
 
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white">
-      <div className="flex h-44 shrink-0 items-center justify-center border-b border-zinc-100 bg-zinc-50">
-        <Doodle url={card.drawing_url ?? card.owner_drawing_url} className="h-32 w-32" />
+      <div className="h-44 shrink-0 overflow-hidden border-b border-zinc-100 bg-zinc-50">
+        <CardHeaderDoodle url={card.drawing_url} fallbackUrl={card.owner_drawing_url} />
       </div>
 
       <div className={`flex-1 p-4 ${expanded ? 'overflow-y-auto' : 'overflow-hidden'}`}>
@@ -39,7 +82,11 @@ export function CardView({ card }: { card: CardViewData }) {
           <button
             type="button"
             className="mt-1 text-sm font-medium text-zinc-900 underline"
-            onClick={() => setExpanded(true)}
+            onClick={(e) => {
+              // don't bubble into tap-to-close containers (card preview)
+              e.stopPropagation()
+              setExpanded(true)
+            }}
           >
             {de.common.more}
           </button>

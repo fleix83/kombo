@@ -12,6 +12,7 @@ import { CityInput } from '../ui/components/CityInput'
 import { DrawingCanvas, type DrawingCanvasHandle } from '../ui/components/DrawingCanvas'
 import { Doodle } from '../ui/components/Doodle'
 import { Field, Input, TextArea } from '../ui/components/Field'
+import { RadiusSlider } from '../ui/components/RadiusSlider'
 import { de } from '../ui/i18n/de'
 
 const typeOptions: { type: CardType; explainer: string }[] = [
@@ -53,6 +54,7 @@ export function CardFormPage() {
       setShowMentors(existing.show_mentors)
     } else if (profile) {
       setCity({ city: profile.city, lat: profile.lat, lng: profile.lng, label: profile.city })
+      setRadiusKm(profile.radius_km)
     }
   }, [existing, profile])
 
@@ -180,20 +182,7 @@ export function CardFormPage() {
           <CityInput value={city} onChange={setCity} />
         </Field>
 
-        <div>
-          <span className="mb-1 block text-sm font-medium text-zinc-700">
-            {de.cardForm.radius}: {radiusKm} km
-          </span>
-          <input
-            type="range"
-            min={5}
-            max={200}
-            step={5}
-            value={radiusKm}
-            onChange={(e) => setRadiusKm(Number(e.target.value))}
-            className="w-full accent-zinc-900"
-          />
-        </div>
+        <RadiusSlider value={radiusKm} onChange={setRadiusKm} />
 
         {type === 'project' && (
           <div>
@@ -229,13 +218,14 @@ export function CardFormPage() {
           </span>
           {isEdit && existing?.drawing_url && !redraw ? (
             <div className="flex items-center gap-4 rounded-xl border border-zinc-200 p-3">
-              <Doodle url={existing.drawing_url} className="h-16 w-16" />
+              <Doodle url={existing.drawing_url} className="h-16 w-24" />
               <Button variant="secondary" onClick={() => setRedraw(true)} type="button">
                 {de.cardForm.drawingRedraw}
               </Button>
             </div>
           ) : (
-            <DrawingCanvas ref={canvasRef} />
+            // wide canvas → new card doodles fill the deck-card header
+            <DrawingCanvas ref={canvasRef} aspect={2.4} />
           )}
         </div>
 

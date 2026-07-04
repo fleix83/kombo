@@ -15,6 +15,7 @@ export interface Profile {
   lat: number
   lng: number
   drawing_url: string | null
+  radius_km: number
   onboarding_complete: boolean
   created_at: string
   updated_at: string
@@ -110,4 +111,5 @@ export interface ProfileInput {
   lng: number
   bio?: string | null
   drawing_url?: string | null
+  radius_km?: number
 }

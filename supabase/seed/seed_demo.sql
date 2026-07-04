@@ -95,3 +95,46 @@ values
   ('d0000000-0000-4000-8000-000000000021', 'collab_offer', 'Texterin für Zines und Websites', 'Portraits, Reportagen, Mikrotexte. Ich mache aus euren Stichworten Sätze, die man gern liest.', 'Aarau', 47.39, 8.05, 80, true, true),
   ('d0000000-0000-4000-8000-000000000022', 'project', 'Hofkino im Kleinbasel', 'Open-Air-Kino für einen Innenhof: 4 Abende im Spätsommer, Kurzfilme aus der Region. Suche Technik-Hilfe, Kurator:innen und Leute für die Bar.', 'Basel', 47.56, 7.59, 30, true, true)
 ;
+
+-- ---------------------------------------------------------------- user 23
+-- Rio: abstract FULL-BLEED doodle in the wide card-header format (240×100)
+-- to demo how new-style card doodles span the whole header.
+insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at,
+  raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+  confirmation_token, recovery_token, email_change_token_new, email_change,
+  email_change_token_current, phone_change, phone_change_token, reauthentication_token)
+values ('d0000000-0000-4000-8000-000000000023', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
+  'demo-23@combo-demo.invalid', extensions.crypt(gen_random_uuid()::text, extensions.gen_salt('bf')), now(),
+  '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', '', '', '', '', '')
+on conflict (id) do nothing;
+
+insert into public.profiles (id, display_name, birth_date, bio, city, lat, lng, onboarding_complete)
+values ('d0000000-0000-4000-8000-000000000023', 'Rio', '1995-08-14', 'Grossformatige abstrakte Malerei, am liebsten draussen.', 'Basel', 47.56, 7.59, true)
+on conflict (id) do nothing;
+
+insert into public.cards (owner_id, type, title, description, city, lat, lng, radius_km, drawing_url)
+values (
+  'd0000000-0000-4000-8000-000000000023', 'collab_offer',
+  'Malerin für grosse Wandflächen',
+  'Abstrakte Formen, kräftige Farben, keine Angst vor 8-Meter-Wänden. Suche ein Projekt, das eine Fläche füllen will.',
+  'Basel', 47.56, 7.59, 50,
+  'data:image/svg+xml;base64,' || replace(encode(convert_to(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 100" fill="none" stroke-linecap="round" stroke-linejoin="round">'
+    || '<path d="M2 10 C40 44 78 -8 120 28 C162 66 200 6 238 36" stroke="#2563eb" stroke-width="7"/>'
+    || '<path d="M2 90 C48 62 92 108 140 72 C182 42 212 96 238 62" stroke="#dc2626" stroke-width="7"/>'
+    || '<circle cx="20" cy="70" r="16" stroke="#eab308" stroke-width="6"/>'
+    || '<circle cx="216" cy="20" r="14" stroke="#16a34a" stroke-width="6"/>'
+    || '<path d="M62 96 L76 68 L90 96 L104 68 L118 96" stroke="#7c3aed" stroke-width="6"/>'
+    || '<path d="M160 4 L178 26 M178 4 L160 26" stroke="#ea580c" stroke-width="6"/>'
+    || '<circle cx="130" cy="12" r="5" fill="#78350f"/>'
+    || '<circle cx="200" cy="88" r="5" fill="#18181b"/>'
+    || '</svg>', 'utf8'), 'base64'), E'\n', '')
+);
+
+update public.profiles p
+set drawing_url = 'data:image/svg+xml;base64,' || replace(encode(convert_to(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round">'
+  || '<g transform="rotate(8 50 50)"><circle cx="50" cy="50" r="30" stroke="#7c3aed" stroke-width="6"/>'
+  || '<circle cx="41" cy="43" r="3.5" fill="#7c3aed"/><circle cx="59" cy="43" r="3.5" fill="#7c3aed"/>'
+  || '<path d="M40 62 Q50 68 60 62" stroke="#7c3aed" stroke-width="6"/></g></svg>', 'utf8'), 'base64'), E'\n', '')
+where p.id = 'd0000000-0000-4000-8000-000000000023' and p.drawing_url is null;

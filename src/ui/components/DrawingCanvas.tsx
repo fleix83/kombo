@@ -13,7 +13,10 @@ import { de } from '../i18n/de'
 // else talks to it through the narrow exportPng()/isEmpty() handle, so the
 // native app can swap in a Skia implementation.
 
-const SIZE = 800 // internal resolution; export is 800×800 transparent PNG
+// Internal resolution; export stays within the PRD's ~800×800 max.
+// aspect = 1 → square (profile doodles); aspect ≈ 2.4 → card-header format,
+// so new card doodles fill the deck card header edge-to-edge.
+const SIZE = 800
 
 const COLORS = ['#18181b', '#dc2626', '#ea580c', '#eab308', '#16a34a', '#2563eb', '#7c3aed', '#78350f']
 const WIDTHS = [6, 12, 22]
@@ -48,7 +51,7 @@ function strokePath(stroke: Stroke): Path2D {
 function drawAll(canvas: HTMLCanvasElement, strokes: Stroke[], current: Stroke | null) {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
-  ctx.clearRect(0, 0, SIZE, SIZE)
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
   for (const stroke of [...strokes, ...(current ? [current] : [])]) {
     ctx.globalCompositeOperation = stroke.eraser ? 'destination-out' : 'source-over'
     ctx.fillStyle = stroke.color
@@ -57,7 +60,10 @@ function drawAll(canvas: HTMLCanvasElement, strokes: Stroke[], current: Stroke |
   ctx.globalCompositeOperation = 'source-over'
 }
 
-export const DrawingCanvas = forwardRef<DrawingCanvasHandle>(function DrawingCanvas(_props, ref) {
+export const DrawingCanvas = forwardRef<DrawingCanvasHandle, { aspect?: number }>(
+  function DrawingCanvas({ aspect = 1 }, ref) {
+  const canvasWidth = SIZE
+  const canvasHeight = Math.round(SIZE / aspect)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [strokes, setStrokes] = useState<Stroke[]>([])
   // The in-progress stroke is drawn imperatively (no re-render per pointermove)
@@ -86,7 +92,7 @@ export const DrawingCanvas = forwardRef<DrawingCanvasHandle>(function DrawingCan
 
   function pointFromEvent(e: PointerEvent<HTMLCanvasElement>): number[] {
     const rect = e.currentTarget.getBoundingClientRect()
-    const scale = SIZE / rect.width
+    const scale = canvasWidth / rect.width
     return [(e.clientX - rect.left) * scale, (e.clientY - rect.top) * scale, e.pressure || 0.5]
   }
 
@@ -114,12 +120,16 @@ export const DrawingCanvas = forwardRef<DrawingCanvasHandle>(function DrawingCan
     setStrokes((prev) => [...prev, current])
   }
 
-  // Rotates the whole drawing 90° clockwise: (x, y) → (SIZE − y, x)
+  // Square canvas: rotate 90° clockwise (x, y) → (SIZE − y, x).
+  // Wide canvas: 90° would leave the frame, so rotate 180° instead.
   function rotate() {
     setStrokes(
       strokes.map((s) => ({
         ...s,
-        points: s.points.map(([x, y, p]) => [SIZE - y, x, p]),
+        points:
+          aspect === 1
+            ? s.points.map(([x, y, p]) => [SIZE - y, x, p])
+            : s.points.map(([x, y, p]) => [canvasWidth - x, canvasHeight - y, p]),
       })),
     )
   }
@@ -133,9 +143,10 @@ export const DrawingCanvas = forwardRef<DrawingCanvasHandle>(function DrawingCan
     <div>
       <canvas
         ref={canvasRef}
-        width={SIZE}
-        height={SIZE}
-        className="aspect-square w-full touch-none rounded-2xl border border-zinc-300 bg-white"
+        width={canvasWidth}
+        height={canvasHeight}
+        style={{ aspectRatio: String(aspect) }}
+        className="w-full touch-none rounded-2xl border border-zinc-300 bg-white"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}

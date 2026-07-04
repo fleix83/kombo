@@ -83,6 +83,7 @@ export const de = {
     city: 'Ort',
     bio: 'Über dich (optional)',
     bioPlaceholder: 'Was machst du gern? Woran arbeitest du?',
+    radiusHint: 'Voreinstellung für deine Karten – pro Karte anpassbar.',
     step2Title: 'Dein Doodle',
     step2Text:
       'Zeichne dein Profilbild selbst – mit Finger oder Maus. Kein Foto, nur du und ein Stift.',

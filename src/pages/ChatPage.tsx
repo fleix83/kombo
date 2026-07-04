@@ -7,6 +7,7 @@ import { useChatStore } from '../core/store/chatStore'
 import { useMatchesStore } from '../core/store/matchesStore'
 import type { Message } from '../core/types/db'
 import { Button } from '../ui/components/Button'
+import { CardHeaderDoodle } from '../ui/components/CardView'
 import { ConfirmDialog } from '../ui/components/ConfirmDialog'
 import { Doodle } from '../ui/components/Doodle'
 import { TextArea } from '../ui/components/Field'
@@ -226,8 +227,8 @@ export function ChatPage() {
             className="max-h-[80vh] w-full max-w-sm overflow-y-auto rounded-2xl bg-white"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex h-40 items-center justify-center border-b border-zinc-100 bg-zinc-50">
-              <Doodle url={counterpart.drawing_url ?? owner.drawing_url} className="h-28 w-28" />
+            <div className="h-40 overflow-hidden border-b border-zinc-100 bg-zinc-50">
+              <CardHeaderDoodle url={counterpart.drawing_url} fallbackUrl={owner.drawing_url} />
             </div>
             <div className="p-4">
               <TypeBadge type={counterpart.type} />

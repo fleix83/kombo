@@ -140,18 +140,16 @@ export function MyCardsPage() {
         </div>
       )}
 
-      {/* preview: the card exactly as counterparts see it in the deck */}
+      {/* preview: the card exactly as counterparts see it in the deck.
+          Full screen, nothing but the card — tap anywhere to close. */}
       {preview && profile && (
         <div
-          className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-6"
+          className="fixed inset-0 z-40 cursor-pointer bg-black/60"
           role="dialog"
           aria-modal
           onClick={() => setPreview(null)}
         >
-          <div
-            className="flex h-[70vh] w-full max-w-sm flex-col"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="mx-auto h-full w-full max-w-[420px]">
             <CardView
               card={{
                 card_type: preview.type,
@@ -164,9 +162,6 @@ export function MyCardsPage() {
                 owner_drawing_url: profile.drawing_url,
               }}
             />
-            <Button variant="secondary" full className="mt-3" onClick={() => setPreview(null)}>
-              {de.common.back}
-            </Button>
           </div>
         </div>
       )}

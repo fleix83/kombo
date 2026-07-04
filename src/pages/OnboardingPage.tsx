@@ -10,6 +10,7 @@ import { Button } from '../ui/components/Button'
 import { CityInput } from '../ui/components/CityInput'
 import { DrawingCanvas, type DrawingCanvasHandle } from '../ui/components/DrawingCanvas'
 import { Field, Input, TextArea } from '../ui/components/Field'
+import { RadiusSlider } from '../ui/components/RadiusSlider'
 import { de } from '../ui/i18n/de'
 
 export function OnboardingPage() {
@@ -21,6 +22,7 @@ export function OnboardingPage() {
   const [step, setStep] = useState<1 | 2 | 3>(profile ? 2 : 1)
   const [displayName, setDisplayName] = useState('')
   const [city, setCity] = useState<GeoResult | null>(null)
+  const [radiusKm, setRadiusKm] = useState(50)
   const [bio, setBio] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitError, setSubmitError] = useState('')
@@ -51,6 +53,7 @@ export function OnboardingPage() {
         city: city.city,
         lat: city.lat,
         lng: city.lng,
+        radius_km: radiusKm,
         bio: bio.trim() || null,
       })
       setProfile(created)
@@ -114,6 +117,7 @@ export function OnboardingPage() {
           <Field label={de.onboarding.city} error={errors.city}>
             <CityInput value={city} onChange={setCity} allowGeolocation />
           </Field>
+          <RadiusSlider value={radiusKm} onChange={setRadiusKm} hint={de.onboarding.radiusHint} />
           <Field label={de.onboarding.bio} error={errors.bio}>
             <TextArea
               value={bio}
