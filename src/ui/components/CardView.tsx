@@ -1,13 +1,26 @@
 import { useState } from 'react'
 import { formatDistanceKm } from '../../core/logic/distance'
-import type { DeckCard } from '../../core/types/db'
+import type { CardType } from '../../core/types/db'
 import { de } from '../i18n/de'
 import { Doodle } from './Doodle'
 import { TypeBadge } from './TypeBadge'
 
+// Structural subset of DeckCard so own cards (no distance) render too.
+export interface CardViewData {
+  card_type: CardType
+  title: string
+  description: string
+  city: string
+  distance_km?: number
+  drawing_url: string | null
+  owner_name: string
+  owner_age: number
+  owner_drawing_url?: string | null
+}
+
 // Deck card layout (PRD §5.4): one mobile screen, no page scrolling.
 // Description truncates and expands in place (scrolls inside the card).
-export function CardView({ card }: { card: DeckCard }) {
+export function CardView({ card }: { card: CardViewData }) {
   const [expanded, setExpanded] = useState(false)
 
   return (
@@ -39,8 +52,12 @@ export function CardView({ card }: { card: DeckCard }) {
         </span>
         {' · '}
         {card.city}
-        {' · '}
-        {formatDistanceKm(card.distance_km)}
+        {card.distance_km !== undefined && (
+          <>
+            {' · '}
+            {formatDistanceKm(card.distance_km)}
+          </>
+        )}
       </div>
     </div>
   )

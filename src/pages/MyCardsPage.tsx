@@ -1,17 +1,28 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { setCardStatus } from '../core/api/cards'
+import { calcAge } from '../core/logic/age'
+import { useAuthStore } from '../core/store/authStore'
 import { useCardsStore } from '../core/store/cardsStore'
 import { useMatchesStore } from '../core/store/matchesStore'
 import type { Card } from '../core/types/db'
 import { Button } from '../ui/components/Button'
+import { CardView } from '../ui/components/CardView'
 import { ConfirmDialog } from '../ui/components/ConfirmDialog'
 import { Doodle } from '../ui/components/Doodle'
 import { LoadingScreen } from '../ui/components/Spinner'
 import { TypeBadge } from '../ui/components/TypeBadge'
 import { de } from '../ui/i18n/de'
 
-function CardRow({ card, matchCount }: { card: Card; matchCount: number }) {
+function CardRow({
+  card,
+  matchCount,
+  onPreview,
+}: {
+  card: Card
+  matchCount: number
+  onPreview: (card: Card) => void
+}) {
   const navigate = useNavigate()
   const upsertLocal = useCardsStore((s) => s.upsertLocal)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -36,19 +47,23 @@ function CardRow({ card, matchCount }: { card: Card; matchCount: number }) {
 
   return (
     <div className={`rounded-2xl border border-zinc-200 p-4 ${paused ? 'opacity-60' : ''}`}>
-      <div className="flex items-start gap-3">
+      <button
+        type="button"
+        className="flex w-full items-start gap-3 text-left"
+        onClick={() => onPreview(card)}
+      >
         <Doodle url={card.drawing_url} className="h-12 w-12" />
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
+        <span className="min-w-0 flex-1">
+          <span className="flex items-center gap-2">
             <TypeBadge type={card.type} />
             <span className="text-xs text-zinc-500">
               {paused ? de.cards.statusPaused : de.cards.statusActive} · {matchCount}{' '}
               {de.cards.matches}
             </span>
-          </div>
-          <h2 className="mt-1 truncate font-semibold">{card.title}</h2>
-        </div>
-      </div>
+          </span>
+          <span className="mt-1 block truncate font-semibold">{card.title}</span>
+        </span>
+      </button>
       <div className="mt-3 flex gap-2">
         <Button
           variant="secondary"
@@ -88,6 +103,8 @@ export function MyCardsPage() {
   const cards = useCardsStore((s) => s.cards)
   const loaded = useCardsStore((s) => s.loaded)
   const overview = useMatchesStore((s) => s.overview)
+  const profile = useAuthStore((s) => s.profile)
+  const [preview, setPreview] = useState<Card | null>(null)
 
   if (!loaded) return <LoadingScreen />
 
@@ -113,8 +130,44 @@ export function MyCardsPage() {
       ) : (
         <div className="space-y-3">
           {cards.map((card) => (
-            <CardRow key={card.id} card={card} matchCount={matchCounts.get(card.id) ?? 0} />
+            <CardRow
+              key={card.id}
+              card={card}
+              matchCount={matchCounts.get(card.id) ?? 0}
+              onPreview={setPreview}
+            />
           ))}
+        </div>
+      )}
+
+      {/* preview: the card exactly as counterparts see it in the deck */}
+      {preview && profile && (
+        <div
+          className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-6"
+          role="dialog"
+          aria-modal
+          onClick={() => setPreview(null)}
+        >
+          <div
+            className="flex h-[70vh] w-full max-w-sm flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CardView
+              card={{
+                card_type: preview.type,
+                title: preview.title,
+                description: preview.description,
+                city: preview.city,
+                drawing_url: preview.drawing_url,
+                owner_name: profile.display_name,
+                owner_age: calcAge(profile.birth_date),
+                owner_drawing_url: profile.drawing_url,
+              }}
+            />
+            <Button variant="secondary" full className="mt-3" onClick={() => setPreview(null)}>
+              {de.common.back}
+            </Button>
+          </div>
         </div>
       )}
     </div>
